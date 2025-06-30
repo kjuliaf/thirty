@@ -1,8 +1,8 @@
 package se.umu.cs.ens21jfg.thirty
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.snackbar.Snackbar
 
 class GameActivity : AppCompatActivity() {
     private lateinit var game: Game
@@ -76,8 +77,18 @@ class GameActivity : AppCompatActivity() {
 
     private fun setNextRoundButtonClickListener() {
         nextRoundButton.setOnClickListener {
+            game.saveResult()
+            val lastResult = game.results.lastOrNull()
+            lastResult?.let {
+                Snackbar.make(findViewById(R.id.main), "+${it.score} points in ${it.mode}'s", Snackbar.LENGTH_SHORT)
+                    .setAnchorView(R.id.nextRoundButton)
+                    .show()
+            }
             if (game.round == 10) {
-                Log.d("Results", game.results.toString())
+                val intent = Intent(this, ResultActivity::class.java)
+                intent.putExtra("results", ArrayList(game.results))
+                startActivity(intent)
+                finish()
             } else {
                 game.nextRound()
                 updateUI()
@@ -139,11 +150,14 @@ class GameActivity : AppCompatActivity() {
         // Update throw/finish buttons
         if (game.throwCount > 0) {
             nextRoundButton.isEnabled = true
+            "Rethrow ${game.throwCount}/2".also { throwButton.text = it }
         } else {
             nextRoundButton.isEnabled = false
+            "Throw".also { throwButton.text = it }
         }
         if (game.throwCount >= 3) {
             throwButton.isEnabled = false
+            "Rethrow 2/2".also { throwButton.text = it }
         } else {
             throwButton.isEnabled = true
         }

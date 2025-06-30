@@ -3,11 +3,12 @@ package se.umu.cs.ens21jfg.thirty
 import android.os.Parcel
 import android.os.Parcelable
 import se.umu.cs.ens21jfg.thirty.GameActivity.Companion.GAME_MODES
+import java.io.Serializable
 
 data class RoundResult(
     val mode: String,
     val score: Int
-)
+) : Serializable
 
 class Game() : Parcelable {
     var round = 1
@@ -69,8 +70,7 @@ class Game() : Parcelable {
         hasSelectedDice = false
     }
 
-    fun nextRound() {
-        // Get result
+    fun saveResult() {
         val calculatedScore: Int
         if (GAME_MODES[selectedModeIndex] == "Low") {
             calculatedScore = calcLowResult()
@@ -78,7 +78,9 @@ class Game() : Parcelable {
             calculatedScore = calcPointsForTarget(GAME_MODES[selectedModeIndex].toInt())
         }
         results.add(RoundResult(mode = GAME_MODES[selectedModeIndex], score = calculatedScore))
+    }
 
+    fun nextRound() {
         // Update game
         round++
         throwCount = 0
