@@ -15,8 +15,8 @@ class Dice() : Parcelable {
         isSelected = parcel.readByte().toInt() != 0
     }
 
-    init {
-        roll()
+    fun reset() {
+        value = 0
     }
 
     fun roll() {

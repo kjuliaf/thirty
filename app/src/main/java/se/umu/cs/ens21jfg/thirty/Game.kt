@@ -60,7 +60,9 @@ class Game() : Parcelable {
                 it.roll()
             }
         }
-        updateDiceSelection()
+        if (throwCount >= 2) {
+            updateDiceSelection()
+        }
     }
 
     private fun updateDiceSelection() {
@@ -87,6 +89,7 @@ class Game() : Parcelable {
         playedModes[selectedModeIndex] = true
         dices.forEach {
             it.isSelected = false
+            it.reset()
         }
         // Get next not already played mode
         val newSelectedIndex = playedModes.indexOfFirst { !it }
@@ -99,31 +102,40 @@ class Game() : Parcelable {
     }
 
     private fun calcPointsForTarget(target: Int): Int {
-        val values = dices.map { it.value }.toMutableList()
-        return target * countCombinations(values, target)
+        val diceValues = dices.map { it.value }.sortedDescending()
+        val usedIndices = mutableSetOf<Int>()
+        var totalScore = 0
+
+        do {
+            val available = diceValues.withIndex()
+                .filter { it.index !in usedIndices }
+                .map { it.value to it.index }
+
+            val newCombination = findCombinationThatSumsToTarget(available, target)
+            if (newCombination != null) {
+                usedIndices.addAll(newCombination)
+                totalScore += target
+            }
+        } while (newCombination != null)
+
+        return totalScore
     }
 
-    private fun countCombinations(values: MutableList<Int>, target: Int): Int {
-        val usedIndices = mutableListOf<Int>()
-        val found = findCombination(values, target, 0, usedIndices)
-        if (!found) return 0
+    private fun findCombinationThatSumsToTarget(available: List<Pair<Int, Int>>, target: Int): List<Int>? {
+        fun backtrack(index: Int, currentSum: Int, path: MutableList<Int>): List<Int>? {
+            if (currentSum == target) return path.toList()
+            if (currentSum > target || index >= available.size) return null
 
-        usedIndices.sortedDescending().forEach { values.removeAt(it) }
+            val (value, originalIndex) = available[index]
 
-        return 1 + countCombinations(values, target)
-    }
+            path.add(originalIndex)
+            backtrack(index + 1, currentSum + value, path)?.let { return it }
+            path.removeAt(path.size - 1)
 
-    private fun findCombination(values: List<Int>, target: Int, start: Int, usedIndices: MutableList<Int>): Boolean {
-        if (target == 0) return true
-        if (target < 0 || start >= values.size) return false
-
-        usedIndices.add(start)
-        if (findCombination(values, target - values[start], start + 1, usedIndices)) {
-            return true
+            return backtrack(index + 1, currentSum, path)
         }
-        usedIndices.removeAt(usedIndices.size - 1)
 
-        return findCombination(values, target, start + 1, usedIndices)
+        return backtrack(0, 0, mutableListOf())
     }
 
     override fun describeContents(): Int {

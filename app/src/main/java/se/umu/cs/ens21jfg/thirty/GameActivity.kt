@@ -142,7 +142,7 @@ class GameActivity : AppCompatActivity() {
 
         // Update dices displayed
         game.dices.forEachIndexed { index, dice ->
-            val resId = DICE_DRAWABLES[dice.value - 1]
+            val resId = DICE_DRAWABLES[dice.value]
             val imageView = diceImages[index]
             imageView.setImageResource(resId)
             imageView.alpha = if (dice.isSelected) 1.0f else 0.4f
@@ -170,6 +170,7 @@ class GameActivity : AppCompatActivity() {
 
     companion object {
         val DICE_DRAWABLES = listOf(
+            R.drawable.dice_0,
             R.drawable.dice_1,
             R.drawable.dice_2,
             R.drawable.dice_3,
