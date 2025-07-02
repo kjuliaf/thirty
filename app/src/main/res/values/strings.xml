@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Thirty</string>
+    <string name="round">Round</string>
+    <string name="game_mode">Game mode</string>
+    <string name="score">Score</string>
+    <string name="play_again">Play again</string>
+    <string name="result">Result</string>
+    <string name="game_mode_title">Game mode:</string>
+    <string name="low">Low</string>
+    <string name="dice_number_1">Dice number 1</string>
+    <string name="dice_number_2">Dice number 2</string>
+    <string name="dice_number_3">Dice number 3</string>
+    <string name="dice_number_4">Dice number 4</string>
+    <string name="dice_number_5">Dice number 5</string>
+    <string name="dice_number_6">Dice number 6</string>
+    <string name="throw_title">Throw</string>
+    <string name="next_round">Next round</string>
 </resources>

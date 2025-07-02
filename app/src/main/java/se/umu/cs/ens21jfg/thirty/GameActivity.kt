@@ -13,6 +13,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.snackbar.Snackbar
 
+/**
+ * @author Julia Forsberg, ens21jfg
+ * @version 1.0
+ *
+ * GameActivity is the main activity of the application. It is responsible for the game.
+ */
 class GameActivity : AppCompatActivity() {
     private lateinit var game: Game
     private lateinit var throwButton: Button
@@ -20,6 +26,10 @@ class GameActivity : AppCompatActivity() {
     private lateinit var gameModeText: TextView
     private lateinit var diceImages: List<ImageView>
 
+    /**
+     * Sets up the games initial state. Is built on previous game state if one exists.
+     * @param savedInstanceState the previous game state
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,6 +56,9 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Initializes the dice images.
+     */
     private fun initializeDiceImages() {
         diceImages = listOf(
             findViewById(R.id.dice1),
@@ -57,36 +70,50 @@ class GameActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Initializes the game modes.
+     */
     private fun initializeGameModes() {
         val gameModePicker = findViewById<CardView>(R.id.gameModePicker)
         gameModePicker.setOnClickListener { showGameModeDialog() }
 
-        supportFragmentManager.setFragmentResultListener(ListAlertDialogFragment.ITEM_REQUEST_KEY, this) { _, bundle ->
+        supportFragmentManager.setFragmentResultListener(GameModeDialog.ITEM_REQUEST_KEY, this) { _, bundle ->
             val selectedIndex = bundle.getInt("item", 0)
             game.selectedModeIndex = selectedIndex
             gameModeText.text = GAME_MODES[selectedIndex]
         }
     }
 
+    /**
+     * Sets the click listener for the throw button. Does not throw if no dices are selected.
+     */
     private fun setThrowButtonClickListener() {
         throwButton.setOnClickListener {
+            if (!(game.dices.any { it.isSelected }) && game.throwCount != 0) {
+                return@setOnClickListener
+            }
             game.rollDices()
             updateUI()
         }
     }
 
+    /**
+     * Sets the click listener for the next round button.
+     */
     private fun setNextRoundButtonClickListener() {
         nextRoundButton.setOnClickListener {
             game.saveResult()
             val lastResult = game.results.lastOrNull()
+            // Shows snackbar with result
             lastResult?.let {
-                Snackbar.make(findViewById(R.id.main), "+${it.score} points in ${it.mode}'s", Snackbar.LENGTH_SHORT)
+                Snackbar.make(findViewById(R.id.main), "+${it.score} points in ${it.gameMode}'s", Snackbar.LENGTH_SHORT)
                     .setAnchorView(R.id.nextRoundButton)
                     .show()
             }
+            // Goes to result activity if game is finished
             if (game.round == 10) {
                 val intent = Intent(this, ResultActivity::class.java)
-                intent.putExtra("results", ArrayList(game.results))
+                intent.putParcelableArrayListExtra("results", ArrayList(game.results))
                 startActivity(intent)
                 finish()
             } else {
@@ -96,11 +123,16 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets the click listeners for the dice images, for selecting dices on rethrow.
+     */
     private fun setDiceSelectionListeners() {
         diceImages.forEachIndexed { index, image ->
             image.setOnClickListener {
                 if (game.throwCount == 0 || !throwButton.isEnabled) return@setOnClickListener
 
+                // All dice are preselected unless one is clicked - then the selections are reset and
+                // the chosen one is selected instead
                 if (!game.hasSelectedDice) {
                     game.dices.forEach { it.isSelected = false }
                     game.hasSelectedDice = true
@@ -112,24 +144,35 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Changes how the dices are displayed and hides activity bar on rotation of screen.
+     */
     override fun onResume() {
         super.onResume()
+
         val orientation = resources.configuration.orientation
-        val linearLayout = findViewById<LinearLayout>(R.id.linearLayout)
+        val diceLayout = findViewById<LinearLayout>(R.id.diceLayout)
+
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             supportActionBar?.hide()
-            linearLayout.orientation = LinearLayout.HORIZONTAL
+            diceLayout.orientation = LinearLayout.HORIZONTAL
         } else {
             supportActionBar?.show()
-            linearLayout.orientation = LinearLayout.VERTICAL
+            diceLayout.orientation = LinearLayout.VERTICAL
         }
     }
 
+    /**
+     * Shows dialog for choosing game mode.
+     */
     private fun showGameModeDialog() {
-        val newFragment1 = ListAlertDialogFragment.newInstance(1, "Pick a game mode", GAME_MODES, game.playedModes)
-        newFragment1.show(supportFragmentManager, "dialog")
+        val gameModeDialogFragment = GameModeDialog.newInstance(1, "Pick a game mode", GAME_MODES, game.playedModes)
+        gameModeDialogFragment.show(supportFragmentManager, "dialog")
     }
 
+    /**
+     * Updates the UI based on the current game state.
+     */
     private fun updateUI() {
         // Update round count
         val roundCount = findViewById<TextView>(R.id.roundCount)
@@ -163,11 +206,18 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Saves the current game state.
+     * @param outState the current game state
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable("game", game)
     }
 
+    /**
+     * Companion object containing constant related to the game.
+     */
     companion object {
         val DICE_DRAWABLES = listOf(
             R.drawable.dice_0,
