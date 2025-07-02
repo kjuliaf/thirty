@@ -3,6 +3,12 @@ package se.umu.cs.ens21jfg.thirty
 import org.junit.Test
 import org.junit.Assert.*
 
+/**
+ * @author Julia Forsberg, ens21jfg
+ * @version 1.0
+ *
+ * GameTest is a test class for the Game class. Mainly tests that the result is calculated correctly.
+ */
 class GameTest {
     @Test
     fun shouldCountCorrectLowResult() {

@@ -2,6 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Theme specifics -->
     <color name="light_primary">#6E4DFF</color>
     <color name="light_on_primary">#FFFFFF</color>
     <color name="dark_primary">#9FA8DA</color>

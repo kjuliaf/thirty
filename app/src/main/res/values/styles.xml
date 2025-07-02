@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Dice image styles -->
     <style name="DiceStyle">
         <item name="android:layout_width">64dp</item>
         <item name="android:layout_height">64dp</item>
@@ -7,6 +8,8 @@
         <item name="android:scaleType">fitCenter</item>
         <item name="android:background">?android:selectableItemBackground</item>
     </style>
+
+    <!-- Result table row text styles -->
     <style name="ResultTableRowStyle">
         <item name="android:textSize">12sp</item>
         <item name="android:paddingStart">12dp</item>

@@ -12,9 +12,7 @@ import se.umu.cs.ens21jfg.thirty.GameActivity.Companion.GAME_MODES
  */
 class Game() : Parcelable {
     val dices = MutableList(6) { Dice() }
-
     val playedModes = BooleanArray(13) { false }
-
     val results = mutableListOf<Result>()
 
     var round = 1
@@ -24,7 +22,6 @@ class Game() : Parcelable {
         private set
 
     var selectedModeIndex = 0
-
     var hasSelectedDice = false
 
     /**
