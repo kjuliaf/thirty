@@ -17,8 +17,7 @@ data class Result(val gameMode: String?, val score: Int): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readInt()
-    ) {
-    }
+    )
 
     /**
      * Describes the contents of the parcel.
