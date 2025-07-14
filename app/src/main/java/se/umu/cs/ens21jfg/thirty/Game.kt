@@ -6,7 +6,7 @@ import se.umu.cs.ens21jfg.thirty.GameActivity.Companion.GAME_MODES
 
 /**
  * @author Julia Forsberg, ens21jfg
- * @version 1.0
+ * @version 1.1 - Fixed so that parcel works correctly by reading parcel in correct order.
  *
  * Game represent a game of thirty.
  */
@@ -29,14 +29,13 @@ class Game() : Parcelable {
      * @param parcel The parcel to read the game from.
      */
     constructor(parcel: Parcel) : this() {
+        round = parcel.readInt()
+        selectedModeIndex = parcel.readInt()
+        throwCount = parcel.readInt()
+        hasSelectedDice = parcel.readByte().toInt() != 0
         parcel.readTypedList(dices, Dice.CREATOR)
         parcel.readBooleanArray(playedModes)
         parcel.readTypedList(results, Result.CREATOR)
-        round = parcel.readInt()
-        throwCount = parcel.readInt()
-        selectedModeIndex = parcel.readInt()
-        hasSelectedDice = parcel.readByte().toInt() != 0
-
     }
 
     /**
